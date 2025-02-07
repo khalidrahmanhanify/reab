@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Fetcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .fade-in {
+        opacity: 1;
+      }
+      .fade-out {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto">
+      <!-- Input Section -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <input
+          id="apiUrl"
+          type="text"
+          placeholder="Enter API URL"
+          class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value="https://api.reab.com/courses/new/Please enter course name here"
+        />
+        <button
+          onclick="fetchCourses()"
+          class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-colors duration-200"
+        >
+          Fetch Courses
+        </button>
+      </div>
+
+      <!-- Course Details -->
+      <div
+        id="courseDetails"
+        class="hidden bg-white rounded-lg shadow-md p-6 mb-6"
+      >
+        <!-- Course details will be populated here -->
+      </div>
+
+      <!-- Lessons Container -->
+      <div
+        id="coursesContainer"
+        class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      ></div>
+    </div>
+
+    <!-- Notification -->
+    <div
+      id="notification"
+      class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
+    >
+      Link copied to clipboard!
+    </div>
+
+    <script>
+      async function fetchCourses() {
+        const apiUrl = document.getElementById("apiUrl").value;
+        if (!apiUrl) {
+          alert("Please enter an API URL");
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+          const result = await response.json();
+          const course = result.data.course_detail;
+          const lessons = result.data.course_lessons;
+
+          // Populate course details
+          const courseDetails = document.getElementById("courseDetails");
+          courseDetails.innerHTML = `
+            <div class="mb-6">
+              <h1 class="text-3xl font-bold mb-4">${course.course_title}</h1>
+              <div class="flex items-center mb-4">
+                <img src="${course.profile_picture_cdn}" 
+                     class="w-12 h-12 rounded-full mr-3"
+                     alt="Instructor">
+                <div>
+                  <p class="font-semibold">${course.fullname}</p>
+                  <p class="text-gray-600 text-sm">${course.designation}</p>
+                </div>
+              </div>
+              <div class="prose mb-4">${course.course_overview}</div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-semibold mb-2">What you'll learn:</h3>
+                <ul class="list-disc list-inside">
+                  ${course.course_target_learn
+                    .map((item) => `<li>${item}</li>`)
+                    .join("")}
+                </ul>
+              </div>
+            </div>
+          `;
+          courseDetails.classList.remove("hidden");
+
+          // Populate lessons
+          document.getElementById("coursesContainer").innerHTML = lessons
+            .map(
+              (lesson) => `
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+                  <div class="relative h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                    <img src="${lesson.thumb_url_cdn}" 
+                         class="w-full h-full object-cover"
+                         loading="lazy"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null; this.src='https://dummyimage.com/600x400/fff/aaa'"
+                         alt="${lesson.lesson_title}">
+                    <span class="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                      ${lesson.lesson_duration}
+                    </span>
+                  </div>
+                  <div class="p-4">
+                    <h3 class="font-semibold mb-2">${lesson.lesson_title}</h3>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-600">Lesson #${lesson.lesson_number}</span>
+                      <button onclick="copyLink('${lesson.cdn_url}')" 
+                              class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                        Copy Link
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `
+            )
+            .join("");
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+          alert(
+            "Failed to fetch courses. Please check the console for details."
+          );
+        }
+      }
+
+      function copyLink(url) {
+        navigator.clipboard
+          .writeText(url)
+          .then(() => showNotification())
+          .catch((err) => console.error("Error copying link:", err));
+      }
+
+      function showNotification() {
+        const notification = document.getElementById("notification");
+        notification.classList.add("fade-in");
+        setTimeout(() => {
+          notification.classList.remove("fade-in");
+          notification.classList.add("fade-out");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
