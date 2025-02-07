@@ -6,8 +6,8 @@
     <title>REAB Course Downloader</title>
     <style>
       :root {
-        --primary: #2ecc71;
-        --secondary: #27ae60;
+        --primary: #1c4fd8;
+        --secondary: #1a46c0;
         --bg: #ffffff;
         --text: #2c3e50;
         --card-bg: #f8f9fa;
@@ -50,7 +50,7 @@
       .hero h1 {
         font-size: 3.5rem;
         margin-bottom: 1rem;
-        background: linear-gradient(45deg, #2ecc71, #27ae60);
+        background: linear-gradient(45deg, #3767eb, #0d308f);
         background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: gradientShift 5s infinite alternate;
@@ -113,7 +113,7 @@
 
       .download-btn:hover {
         transform: scale(1.05);
-        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+        box-shadow: 0 10px 25px rgba(46, 96, 204, 0.4);
       }
 
       .download-btn i {
@@ -219,7 +219,8 @@
         <div class="step-card fade-in">
           <div class="step-number">4</div>
           <h3>Paste the name into reab downloader</h3>
-          <p>After copying the name of the course from the URL then go to the reab downloader and paste the name at there.</p>
+          <p>After copying the name of the course from the URL then go to the reab downloader and paste the name at there and then click on Fetch Courses.</p>
+          <img src="images/paste.webp" alt="">
         </div>
       </div>
       </div>
@@ -227,7 +228,7 @@
       <section class="download-section fade-in">
         <a href="./index.html">
           <button class="download-btn">
-            Start Download
+            Download Now
             <i class="arrow">→</i>
           </button>
         </a>
@@ -235,17 +236,6 @@
     </div>
 
     <script>
-      // Theme Toggle
-      function toggleTheme() {
-        document.body.dataset.theme =
-          document.body.dataset.theme === "dark" ? "light" : "dark";
-        localStorage.setItem("theme", document.body.dataset.theme);
-      }
-
-      // Set initial theme
-      const savedTheme = localStorage.getItem("theme") || "light";
-      document.body.dataset.theme = savedTheme;
-
       // Scroll Animations
       const observer = new IntersectionObserver(
         (entries) => {
@@ -261,12 +251,6 @@
       document
         .querySelectorAll(".fade-in")
         .forEach((el) => observer.observe(el));
-
-      // Download Handler
-      function startDownload() {
-        // Add your download logic here
-        alert("Download started! Check your downloads folder.");
-      }
     </script>
   </body>
 </html>
